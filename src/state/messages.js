@@ -15,7 +15,8 @@ const mapObjectToArray = (obj) => (
 
 export const addMessageAsyncActionCreator = () => (dispatch, getState) => {
     const state = getState()
-    database.ref('/chat').push({text: state.messages.newMessageText})    
+    database.ref('/chat').push({text: state.messages.newMessageText}) 
+    dispatch(newTextChangedActionCreator(''))     
 }
 
 export const startListeningMessagesAsyncActionCreator = () => (dispatch, getState) => {
