@@ -2,10 +2,15 @@ const SET = 'messages/SET'
 const ADD = 'messages/ADD'
 const NEW_TEXT_CHANGED = 'messages/NEW_TEXT_CHANGED'
 
-const newTextChangedActionCreator = newMessageText => ({
+export const newTextChangedActionCreator = newMessageText => ({
     type: NEW_TEXT_CHANGED,
     newMessageText
 })
+
+export const addMessageActionCreator = () => ({
+    type: ADD,
+})
+
 
 const initialState = {
     messages: [],
@@ -18,6 +23,14 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 newMessageText: action.newMessageText,
+            }        
+        case ADD:
+            return {
+                ...state,
+                newMessageText: '',
+                messages: state.messages.concat({
+                    text: state.newMessageText,
+                })
             }
         default:
             return state
