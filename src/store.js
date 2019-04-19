@@ -1,12 +1,20 @@
-import { createStore, combineReducers } from 'redux'
+import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
 
-import messages from './state/messages'
+import thunk from 'redux-thunk'
+
+import messages, { startListeningMessagesAsyncActionCreator } from './state/messages'
 
 const rootReducer = combineReducers({
-    messages
+messages
 })
+
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
 export const store = createStore(
     rootReducer,
-    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+    composeEnhancers(
+        applyMiddleware(thunk)
+    )
 )
+
+store.dispatch(startListeningMessagesAsyncActionCreator())

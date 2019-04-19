@@ -1,16 +1,44 @@
+import { database } from '../firebaseConf'
+
 const SET = 'messages/SET'
-const ADD = 'messages/ADD'
 const NEW_TEXT_CHANGED = 'messages/NEW_TEXT_CHANGED'
+
+const mapObjectToArray = (obj) => (
+    Object.entries(obj || {})
+        .map(([key, value]) => (
+            typeof value === 'object' ?
+                { ...value, key }
+                :
+                { key, value }
+        ))
+)
+
+export const addMessageAsyncActionCreator = () => (dispatch, getState) => {
+    const state = getState()
+    database.ref('/chat').push({text: state.messages.newMessageText})    
+}
+
+export const startListeningMessagesAsyncActionCreator = () => (dispatch, getState) => {
+    database.ref('/chat').on(
+        'value',
+        (snapshot) => {
+            dispatch(setMessagesActionCreator(
+                mapObjectToArray(snapshot.val())
+            )
+            )
+        }
+    )
+}
+
+const setMessagesActionCreator = messages => ({
+    type: SET,
+    messages
+})
 
 export const newTextChangedActionCreator = newMessageText => ({
     type: NEW_TEXT_CHANGED,
     newMessageText
 })
-
-export const addMessageActionCreator = () => ({
-    type: ADD,
-})
-
 
 const initialState = {
     messages: [],
@@ -23,14 +51,11 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 newMessageText: action.newMessageText,
-            }        
-        case ADD:
+            }
+        case SET:
             return {
                 ...state,
-                newMessageText: '',
-                messages: state.messages.concat({
-                    text: state.newMessageText,
-                })
+                messages: action.messages,
             }
         default:
             return state
